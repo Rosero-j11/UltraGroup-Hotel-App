@@ -66,7 +66,7 @@ import { Hotel } from '../../../../core/models';
           <mat-form-field appearance="outline" class="filter-field">
             <mat-label>Buscar hotel</mat-label>
             <mat-icon matPrefix>search</mat-icon>
-            <input matInput [(ngModel)]="searchTerm" placeholder="Nombre, ciudad..." />
+            <input matInput [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="Nombre, ciudad..." />
             @if (searchTerm) {
               <button matSuffix mat-icon-button class="clear-btn"
                       matTooltip="Limpiar búsqueda"
@@ -77,7 +77,7 @@ import { Hotel } from '../../../../core/models';
           </mat-form-field>
           <mat-form-field appearance="outline" class="filter-field">
             <mat-label>Estado</mat-label>
-            <mat-select [(ngModel)]="statusFilter">
+            <mat-select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
               <mat-option value="">Todos</mat-option>
               <mat-option value="active">Activos</mat-option>
               <mat-option value="inactive">Inactivos</mat-option>
@@ -219,18 +219,18 @@ export class HotelListComponent implements OnInit {
   readonly hotels = this.hotelService.hotels;
   readonly loading = this.hotelService.loading;
 
-  searchTerm = '';
-  statusFilter = '';
+  searchTerm = signal('');
+  statusFilter = signal('');
 
   readonly filteredHotels = computed(() => {
-    const term = this.searchTerm.toLowerCase();
+    const term = this.searchTerm().toLowerCase();
     return this.hotels().filter(h => {
       const matchesSearch =
         !term ||
         h.name.toLowerCase().includes(term) ||
         h.city.toLowerCase().includes(term) ||
         h.address.toLowerCase().includes(term);
-      const matchesStatus = !this.statusFilter || h.status === this.statusFilter;
+      const matchesStatus = !this.statusFilter() || h.status === this.statusFilter();
       return matchesSearch && matchesStatus;
     });
   });
@@ -244,8 +244,8 @@ export class HotelListComponent implements OnInit {
   }
 
   clearFilters(): void {
-    this.searchTerm = '';
-    this.statusFilter = '';
+    this.searchTerm.set('');
+    this.statusFilter.set('');
   }
 
   onImageError(event: Event): void {

@@ -42,7 +42,7 @@ import { CopCurrencyPipe } from '../../../../shared/pipes/cop-currency.pipe';
         <div class="filters">
           <mat-form-field appearance="outline" class="filter-field">
             <mat-label>Hotel</mat-label>
-            <mat-select [(ngModel)]="hotelFilter">
+            <mat-select [ngModel]="hotelFilter()" (ngModelChange)="hotelFilter.set($event)">
               <mat-option value="">Todos los hoteles</mat-option>
               @for (hotel of hotels(); track hotel.id) {
                 <mat-option [value]="hotel.id">{{ hotel.name }}</mat-option>
@@ -51,7 +51,7 @@ import { CopCurrencyPipe } from '../../../../shared/pipes/cop-currency.pipe';
           </mat-form-field>
           <mat-form-field appearance="outline" class="filter-field">
             <mat-label>Estado</mat-label>
-            <mat-select [(ngModel)]="statusFilter">
+            <mat-select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
               <mat-option value="">Todos</mat-option>
               <mat-option value="confirmed">Confirmadas</mat-option>
               <mat-option value="pending">Pendientes</mat-option>
@@ -61,7 +61,7 @@ import { CopCurrencyPipe } from '../../../../shared/pipes/cop-currency.pipe';
           <mat-form-field appearance="outline" class="filter-field">
             <mat-label>Buscar huésped</mat-label>
             <mat-icon matPrefix>search</mat-icon>
-            <input matInput [(ngModel)]="guestFilter" placeholder="Nombre o email..." />
+            <input matInput [ngModel]="guestFilter()" (ngModelChange)="guestFilter.set($event)" placeholder="Nombre o email..." />
           </mat-form-field>
           <button mat-stroked-button (click)="clearFilters()">
             <mat-icon>clear</mat-icon>
@@ -168,15 +168,15 @@ export class ReservationListComponent implements OnInit {
   readonly loading = this.reservationService.loading;
   readonly hotels = this.hotelService.hotels;
 
-  hotelFilter = '';
-  statusFilter = '';
-  guestFilter = '';
+  hotelFilter = signal('');
+  statusFilter = signal('');
+  guestFilter = signal('');
 
   readonly filteredReservations = computed(() => {
-    const term = this.guestFilter.toLowerCase();
+    const term = this.guestFilter().toLowerCase();
     return this.reservations().filter(r => {
-      const matchesHotel = !this.hotelFilter || r.hotelId === this.hotelFilter;
-      const matchesStatus = !this.statusFilter || r.status === this.statusFilter;
+      const matchesHotel = !this.hotelFilter() || r.hotelId === this.hotelFilter();
+      const matchesStatus = !this.statusFilter() || r.status === this.statusFilter();
       const matchesGuest = !term ||
         r.guest.fullName.toLowerCase().includes(term) ||
         r.guest.email.toLowerCase().includes(term);
@@ -196,9 +196,9 @@ export class ReservationListComponent implements OnInit {
   }
 
   clearFilters(): void {
-    this.hotelFilter = '';
-    this.statusFilter = '';
-    this.guestFilter = '';
+    this.hotelFilter.set('');
+    this.statusFilter.set('');
+    this.guestFilter.set('');
   }
 
   getRoomTypeLabel(type: string): string {
