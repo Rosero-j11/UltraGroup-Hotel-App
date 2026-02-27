@@ -10,7 +10,7 @@ import { MatMenuModule } from '@angular/material/menu';
   standalone: true,
   imports: [
     RouterOutlet, RouterLink, RouterLinkActive,
-    MatToolbarModule, MatIconModule, MatButtonModule, MatMenuModule
+    MatToolbarModule, MatIconModule, MatButtonModule
   ],
   template: `
     <div class="traveler-wrapper">
@@ -18,11 +18,6 @@ import { MatMenuModule } from '@angular/material/menu';
         <mat-icon class="logo-icon">flight_takeoff</mat-icon>
         <a class="brand-link" routerLink="/traveler">UltraHotels</a>
         <span class="spacer"></span>
-        <nav class="toolbar-nav">
-          <a mat-button routerLink="/traveler/search" routerLinkActive="active-nav">
-            <mat-icon>search</mat-icon> Buscar
-          </a>
-        </nav>
         <a mat-stroked-button routerLink="/admin" class="admin-btn">
           <mat-icon>admin_panel_settings</mat-icon>
           <span class="admin-label">Panel Admin</span>
@@ -51,10 +46,6 @@ import { MatMenuModule } from '@angular/material/menu';
       margin-left: 0.1rem;
     }
     .spacer { flex: 1; }
-    .toolbar-nav { display: flex; gap: 0.1rem; }
-    .toolbar-nav a { color: white !important; }
-    .toolbar-nav a .mat-icon, .toolbar-nav a mat-icon { color: white !important; }
-    .active-nav { background: rgba(255,255,255,0.15) !important; color: white !important; }
     .admin-btn { color: white !important; border-color: rgba(255,255,255,0.5) !important; margin-left: 0.25rem; font-size: 0.8rem !important; padding: 0 0.5rem !important; }
     .admin-btn .mat-icon, .admin-btn mat-icon { color: white !important; }
     /* Ocultar texto admin en móvil */
