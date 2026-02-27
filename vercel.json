@@ -1,5 +1,6 @@
 {
-  "buildCommand": "npm run build",
+  "installCommand": "npm ci",
+  "buildCommand": "npx ng build --configuration production --no-analytics",
   "outputDirectory": "dist/ultragroup-hotel-app/browser",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
