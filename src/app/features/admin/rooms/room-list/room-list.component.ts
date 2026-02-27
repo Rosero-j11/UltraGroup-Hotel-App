@@ -54,23 +54,23 @@ const ROOM_TYPE_LABELS: Record<string, string> = {
         <div class="filters">
           <mat-form-field appearance="outline" class="filter-field">
             <mat-label>Hotel</mat-label>
-            <mat-select [(ngModel)]="hotelFilter">
+            <mat-select [ngModel]="hotelFilter()" (ngModelChange)="hotelFilter.set($event)">
               <mat-option value="">Todos los hoteles</mat-option>
               @for (hotel of hotels(); track hotel.id) {
                 <mat-option [value]="hotel.id">{{ hotel.name }}</mat-option>
               }
             </mat-select>
-            @if (hotelFilter) {
+            @if (hotelFilter()) {
               <button matSuffix mat-icon-button class="clear-btn"
                       matTooltip="Limpiar hotel"
-                      (click)="$event.stopPropagation(); hotelFilter = ''">
+                      (click)="$event.stopPropagation(); hotelFilter.set('')">
                 <mat-icon>close</mat-icon>
               </button>
             }
           </mat-form-field>
           <mat-form-field appearance="outline" class="filter-field">
             <mat-label>Tipo</mat-label>
-            <mat-select [(ngModel)]="typeFilter">
+            <mat-select [ngModel]="typeFilter()" (ngModelChange)="typeFilter.set($event)">
               <mat-option value="">Todos los tipos</mat-option>
               <mat-option value="single">Individual</mat-option>
               <mat-option value="double">Doble</mat-option>
@@ -78,25 +78,25 @@ const ROOM_TYPE_LABELS: Record<string, string> = {
               <mat-option value="family">Familiar</mat-option>
               <mat-option value="penthouse">Penthouse</mat-option>
             </mat-select>
-            @if (typeFilter) {
+            @if (typeFilter()) {
               <button matSuffix mat-icon-button class="clear-btn"
                       matTooltip="Limpiar tipo"
-                      (click)="$event.stopPropagation(); typeFilter = ''">
+                      (click)="$event.stopPropagation(); typeFilter.set('')">
                 <mat-icon>close</mat-icon>
               </button>
             }
           </mat-form-field>
           <mat-form-field appearance="outline" class="filter-field">
             <mat-label>Estado</mat-label>
-            <mat-select [(ngModel)]="statusFilter">
+            <mat-select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
               <mat-option value="">Todos</mat-option>
               <mat-option value="active">Activas</mat-option>
               <mat-option value="inactive">Inactivas</mat-option>
             </mat-select>
-            @if (statusFilter) {
+            @if (statusFilter()) {
               <button matSuffix mat-icon-button class="clear-btn"
                       matTooltip="Limpiar estado"
-                      (click)="$event.stopPropagation(); statusFilter = ''">
+                      (click)="$event.stopPropagation(); statusFilter.set('')">
                 <mat-icon>close</mat-icon>
               </button>
             }
@@ -215,15 +215,15 @@ export class RoomListComponent implements OnInit {
   readonly loading = this.roomService.loading;
   readonly hotels = this.hotelService.hotels;
 
-  hotelFilter = '';
-  typeFilter = '';
-  statusFilter = '';
+  hotelFilter = signal('');
+  typeFilter = signal('');
+  statusFilter = signal('');
 
   readonly filteredRooms = computed(() => {
     return this.rooms().filter(r => {
-      const matchesHotel = !this.hotelFilter || r.hotelId === this.hotelFilter;
-      const matchesType = !this.typeFilter || r.type === this.typeFilter;
-      const matchesStatus = !this.statusFilter || r.status === this.statusFilter;
+      const matchesHotel = !this.hotelFilter() || r.hotelId === this.hotelFilter();
+      const matchesType = !this.typeFilter() || r.type === this.typeFilter();
+      const matchesStatus = !this.statusFilter() || r.status === this.statusFilter();
       return matchesHotel && matchesType && matchesStatus;
     });
   });
@@ -241,9 +241,9 @@ export class RoomListComponent implements OnInit {
   }
 
   clearFilters(): void {
-    this.hotelFilter = '';
-    this.typeFilter = '';
-    this.statusFilter = '';
+    this.hotelFilter.set('');
+    this.typeFilter.set('');
+    this.statusFilter.set('');
   }
 
   getRoomTypeLabel(type: string): string {
