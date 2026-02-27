@@ -48,6 +48,7 @@ describe('HotelService', () => {
   let httpMock: HttpTestingController;
 
   beforeEach(fakeAsync(() => {
+    localStorage.removeItem('ug_hotels'); // evita que el cache cortocircuite los mocks HTTP
     TestBed.configureTestingModule({
       providers: [
         HotelService,
@@ -61,6 +62,9 @@ describe('HotelService', () => {
     // Hay que consumir esa request para que httpMock.verify() no falle.
     httpMock.expectOne('assets/data/hotels.json').flush([]);
     tick(400); // avanza el delay(400) del auto-load
+    // Limpiar el cache que persist() escribió con [] para que cada test
+    // que llame loadHotels() dispare una petición HTTP fresca.
+    localStorage.removeItem('ug_hotels');
   }));
 
   afterEach(() => {
@@ -211,5 +215,20 @@ describe('HotelService', () => {
 
     expect(updated!.name).toBe('Nombre Actualizado');
     expect(service.getHotelById('hotel-001')?.name).toBe('Nombre Actualizado');
+  }));
+
+  it('debería eliminar un hotel del signal', fakeAsync(() => {
+    service.loadHotels().subscribe();
+    httpMock.expectOne('assets/data/hotels.json').flush(MOCK_HOTELS);
+    tick(400);
+
+    expect(service.hotels().length).toBe(2);
+
+    service.deleteHotel('hotel-001').subscribe();
+    tick(300); // avanza delay(300) de deleteHotel
+
+    expect(service.hotels().length).toBe(1);
+    expect(service.getHotelById('hotel-001')).toBeUndefined();
+    expect(service.getHotelById('hotel-002')).toBeDefined();
   }));
 });

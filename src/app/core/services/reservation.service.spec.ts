@@ -36,6 +36,7 @@ describe('ReservationService', () => {
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
+    localStorage.removeItem('ug_reservations'); // evita que el cache interfiera entre tests
     TestBed.configureTestingModule({
       providers: [
         ReservationService,

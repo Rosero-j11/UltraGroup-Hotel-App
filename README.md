@@ -270,7 +270,7 @@ Los componentes **nunca** hacen llamadas HTTP directamente.
 
 | Archivo | Tests | Qué se prueba |
 |---|---|---|
-| `hotel.service.spec.ts` | 10 | Estado inicial, carga HTTP, CRUD, filtros por ciudad, toggleStatus, manejo de errores |
+| `hotel.service.spec.ts` | 14 | Estado inicial, carga HTTP, CRUD, eliminar, filtros por ciudad, toggleStatus, manejo de errores |
 | `reservation.service.spec.ts` | 5 | Carga, creación con cálculo de noches × precio, filtros, cancelación |
 
 ### Tecnologías
