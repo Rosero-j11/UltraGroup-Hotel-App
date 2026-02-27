@@ -67,10 +67,10 @@ import { Hotel } from '../../../../core/models';
             <mat-label>Buscar hotel</mat-label>
             <mat-icon matPrefix>search</mat-icon>
             <input matInput [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="Nombre, ciudad..." />
-            @if (searchTerm) {
+            @if (searchTerm()) {
               <button matSuffix mat-icon-button class="clear-btn"
                       matTooltip="Limpiar búsqueda"
-                      (click)="searchTerm = ''">
+                      (click)="searchTerm.set('')">
                 <mat-icon>close</mat-icon>
               </button>
             }
@@ -82,10 +82,10 @@ import { Hotel } from '../../../../core/models';
               <mat-option value="active">Activos</mat-option>
               <mat-option value="inactive">Inactivos</mat-option>
             </mat-select>
-            @if (statusFilter) {
+            @if (statusFilter()) {
               <button matSuffix mat-icon-button class="clear-btn"
                       matTooltip="Limpiar estado"
-                      (click)="$event.stopPropagation(); statusFilter = ''">
+                      (click)="$event.stopPropagation(); statusFilter.set('')">
                 <mat-icon>close</mat-icon>
               </button>
             }

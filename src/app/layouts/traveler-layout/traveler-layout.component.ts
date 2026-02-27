@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet, RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +9,7 @@ import { MatMenuModule } from '@angular/material/menu';
   selector: 'app-traveler-layout',
   standalone: true,
   imports: [
-    RouterOutlet, RouterLink, RouterLinkActive,
+    RouterOutlet, RouterLink,
     MatToolbarModule, MatIconModule, MatButtonModule
   ],
   template: `
