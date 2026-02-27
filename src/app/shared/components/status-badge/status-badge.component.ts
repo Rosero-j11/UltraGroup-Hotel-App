@@ -5,8 +5,6 @@ import { MatIconModule } from '@angular/material/icon';
 
 export type StatusType = 'active' | 'inactive' | 'confirmed' | 'pending' | 'cancelled';
 
-export type StatusType = 'active' | 'inactive' | 'confirmed' | 'pending' | 'cancelled';
-
 /**
  * Chip de estado visual que muestra el estado de un hotel o reserva.
  *

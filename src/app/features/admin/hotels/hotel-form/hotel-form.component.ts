@@ -179,6 +179,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
  * por una subida a S3/Cloudinary.
  */
 export class HotelFormComponent implements OnInit {
+  private readonly fb = inject(FormBuilder);
   private readonly hotelService = inject(HotelService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
