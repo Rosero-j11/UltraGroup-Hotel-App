@@ -2,6 +2,21 @@ import { Component, Input } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CommonModule } from '@angular/common';
 
+/**
+ * Spinner de carga reutilizable con dos modos de visualización.
+ *
+ * - **Modo overlay** (`inline=false`, por defecto): ocupa toda la pantalla con
+ *   fondo semi-transparente. Ideal para bloquear la UI durante cargas de página.
+ * - **Modo inline** (`inline=true`): se integra en el flujo del contenido,
+ *   útil dentro de cards o secciones específicas.
+ *
+ * @example
+ * <!-- Modo overlay con mensaje -->
+ * <app-loading-spinner [visible]="loading()" message="Cargando hoteles..." />
+ *
+ * <!-- Modo inline pequeño -->
+ * <app-loading-spinner [visible]="saving" [inline]="true" [diameter]="24" />
+ */
 @Component({
   selector: 'app-loading-spinner',
   standalone: true,

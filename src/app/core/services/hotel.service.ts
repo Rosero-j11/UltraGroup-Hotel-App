@@ -4,6 +4,30 @@ import { Observable, tap, catchError, throwError, of, delay } from 'rxjs';
 import { Hotel, CreateHotelDto, UpdateHotelDto, HotelStatus } from '../models';
 import { v4 as uuidv4 } from 'uuid';
 
+/**
+ * Servicio centralizado para la gestión de hoteles.
+ *
+ * ## Patrón de estado: Angular Signals
+ * El estado interno usa `signal<Hotel[]>()` para reactividad granular
+ * sin necesidad de NgRx. Los consumidores leen `hotels()`, `loading()` y `error()`
+ * que son versiones `asReadonly()` — garantizan inmutabilidad externa.
+ *
+ * ## Estrategia de persistencia: Cache-First con localStorage
+ * 1. Al iniciar, `loadHotels()` revisa `localStorage` antes de hacer HTTP.
+ * 2. Si existe caché válido, lo usa inmediatamente (sin delay de red).
+ * 3. Si no, hace GET al JSON estático en `assets/data/hotels.json`.
+ * 4. Toda mutación (create/update/delete) llama a `persist()` para sincronizar.
+ *
+ * ## Mock API
+ * Los métodos CRUD no llaman a un backend real; usan `of(value).pipe(delay(ms))`
+ * para simular latencia y estructura idéntica a llamadas HTTP reales.
+ * Migrar a un API real solo requiere cambiar el cuerpo del observable.
+ *
+ * @example
+ * // Inyección en un componente standalone
+ * private readonly hotelService = inject(HotelService);
+ * hotels = this.hotelService.hotels; // Signal<Hotel[]> readonly
+ */
 @Injectable({ providedIn: 'root' })
 export class HotelService {
   private readonly http = inject(HttpClient);
@@ -28,7 +52,11 @@ export class HotelService {
 
   readonly hotelCount = computed(() => this._hotels().length);
 
-  /** Guarda el estado actual en localStorage (silencia errores de quota/privado) */
+  /**
+   * Serializa el estado actual en `localStorage`.
+   * Envuelto en try-catch para silenciar `QuotaExceededError` (localStorage lleno
+   * o modo privado), evitando que el error propagarse por el stream RxJS del `tap()`.
+   */
   private persist(): void {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._hotels()));
@@ -37,6 +65,12 @@ export class HotelService {
     }
   }
 
+  /**
+   * Carga la lista de hoteles aplicando estrategia cache-first.
+   * Se suscribe automáticamente en el constructor para poblar el signal al arrancar.
+   *
+   * @returns Observable con el array de hoteles (desde caché o desde HTTP).
+   */
   loadHotels(): Observable<Hotel[]> {
     // Si ya hay datos en localStorage, los usa directamente (persiste entre recargas)
     const cached = localStorage.getItem(this.STORAGE_KEY);
@@ -68,16 +102,32 @@ export class HotelService {
     );
   }
 
+  /**
+   * Busca un hotel por su ID en el signal local.
+   * Retorna `undefined` si no existe — los componentes deben manejar este caso
+   * (p.ej. redirigir a 404 o mostrar estado vacío).
+   */
   getHotelById(id: string): Hotel | undefined {
     return this._hotels().find(h => h.id === id);
   }
 
+  /**
+   * Filtra hoteles activos por ciudad (case-insensitive).
+   * Usado por el buscador del viajero para mostrar resultados relevantes.
+   */
   getHotelsByCity(city: string): Hotel[] {
     return this._hotels().filter(
       h => h.city.toLowerCase() === city.toLowerCase() && h.status === 'active'
     );
   }
 
+  /**
+   * Crea un nuevo hotel y lo agrega al signal de manera inmutable (`[...hotels, hotel]`).
+   * Genera un ID único con formato `hotel-{uuid8}` usando la librería `uuid`.
+   *
+   * @param dto Datos del formulario sin incluir campos auto-generados.
+   * @returns Observable con el hotel recién creado.
+   */
   createHotel(dto: CreateHotelDto): Observable<Hotel> {
     this._loading.set(true);
     const newHotel: Hotel = {
@@ -101,6 +151,13 @@ export class HotelService {
     );
   }
 
+  /**
+   * Actualiza un hotel existente combinando los campos del DTO con los datos actuales
+   * mediante spread operator. Solo los campos presentes en el DTO se sobreescriben.
+   *
+   * @param dto Objeto con `id` obligatorio y campos a modificar.
+   * @returns Observable con el hotel actualizado, o error si no existe.
+   */
   updateHotel(dto: UpdateHotelDto): Observable<Hotel> {
     this._loading.set(true);
     const existing = this._hotels().find(h => h.id === dto.id);
@@ -129,6 +186,10 @@ export class HotelService {
     );
   }
 
+  /**
+   * Alterna el estado del hotel entre `active` e `inactive`.
+   * Reutiliza `updateHotel()` para mantener única fuente de persistencia.
+   */
   toggleHotelStatus(id: string): Observable<Hotel> {
     const hotel = this._hotels().find(h => h.id === id);
     if (!hotel) return throwError(() => new Error('Hotel no encontrado'));
@@ -136,6 +197,13 @@ export class HotelService {
     return this.updateHotel({ id, status: newStatus });
   }
 
+  /**
+   * Elimina un hotel del signal usando `filter()` (operación inmutable).
+   * Al persistir, el hotel queda borrado del localStorage en el mismo tick.
+   *
+   * @param id Identificador del hotel a eliminar.
+   * @returns Observable<void> que completa tras el delay simulado.
+   */
   deleteHotel(id: string): Observable<void> {
     return of(void 0).pipe(
       delay(300),
@@ -147,6 +215,10 @@ export class HotelService {
     );
   }
 
+  /**
+   * Devuelve la lista ordenada de ciudades únicas con hoteles activos.
+   * Utilizado por el selector de ciudad en el buscador del viajero.
+   */
   getAvailableCities(): string[] {
     const cities = this._hotels()
       .filter(h => h.status === 'active')

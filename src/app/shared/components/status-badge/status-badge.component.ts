@@ -5,6 +5,25 @@ import { MatIconModule } from '@angular/material/icon';
 
 export type StatusType = 'active' | 'inactive' | 'confirmed' | 'pending' | 'cancelled';
 
+export type StatusType = 'active' | 'inactive' | 'confirmed' | 'pending' | 'cancelled';
+
+/**
+ * Chip de estado visual que muestra el estado de un hotel o reserva.
+ *
+ * Aplica colores semánticos por tipo mediante clases CSS:
+ * - `active`    → verde
+ * - `inactive`  → gris
+ * - `confirmed` → azul
+ * - `pending`   → amarillo
+ * - `cancelled` → rojo
+ *
+ * El `label` se genera como propiedad computada en la clase,
+ * manteniendo la lógica de presentación fuera del template.
+ *
+ * @example
+ * <app-status-badge [status]="hotel.status" />
+ * <app-status-badge [status]="reservation.status" />
+ */
 @Component({
   selector: 'app-status-badge',
   standalone: true,

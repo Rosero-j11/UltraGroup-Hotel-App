@@ -160,8 +160,25 @@ import { NotificationService } from '../../../../core/services/notification.serv
     .form-actions { display: flex; justify-content: flex-end; gap: 1rem; padding-top: 0.5rem; }
   `]
 })
+/**
+ * Formulario reactivo reutilizable para creación y edición de hoteles.
+ *
+ * ## Modo edición vs creación
+ * El modo se determina en `ngOnInit()` verificando si la URL contiene el parámetro `:id`.
+ * Si existe, se carga el hotel con `getHotelById(id)` y se precargan los valores
+ * con `form.patchValue(hotel)`. El signal `isEditing()` controla los textos del template.
+ *
+ * ## Prevención de doble envío
+ * `submitting` signal actúa como guard al inicio de `onSubmit()`: si ya hay una
+ * solicitud en curso, el método retorna inmediatamente sin crear duplicados.
+ *
+ * ## Carga de imagen
+ * Soporta URL externa y carga desde archivo local.
+ * Al seleccionar un archivo, `FileReader.readAsDataURL()` convierte la imagen
+ * a base64, que se almacena como `imageUrl`. En producción esto se reemplazaría
+ * por una subida a S3/Cloudinary.
+ */
 export class HotelFormComponent implements OnInit {
-  private readonly fb = inject(FormBuilder);
   private readonly hotelService = inject(HotelService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -207,6 +224,12 @@ export class HotelFormComponent implements OnInit {
     });
   }
 
+  /**
+   * Valida el formulario y envía los datos al servicio.
+   * - En modo edición: llama `updateHotel()` con el `id` del parámetro de ruta.
+   * - En modo creación: llama `createHotel()` con los datos del formulario.
+   * - Guard de doble envío: retorna si `submitting()` es `true`.
+   */
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -241,6 +264,10 @@ export class HotelFormComponent implements OnInit {
     }
   }
 
+  /**
+   * Convierte el archivo de imagen seleccionado a base64 usando `FileReader`
+   * y actualiza el campo `imageUrl` del formulario + la previsualización.
+   */
   onFileSelected(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;

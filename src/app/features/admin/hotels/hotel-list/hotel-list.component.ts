@@ -19,8 +19,24 @@ import { StarRatingComponent } from '../../../../shared/components/star-rating/s
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Hotel } from '../../../../core/models';
 
+/**
+ * Componente de listado de hoteles para el panel de administración.
+ *
+ * ## Patrón de reactividad
+ * Lee el signal `hotels` del `HotelService` directamente (no necesita subscribe).
+ * `filteredHotels` es un `computed()` que se recalcula automáticamente cuando
+ * cambia `hotels()`, `searchTerm` o `statusFilter`.
+ *
+ * ## Filtrado
+ * Los filtros de búsqueda y estado se combinan con AND: ambos deben coincidir.
+ * La búsqueda es case-insensitive y busca en nombre, ciudad y dirección.
+ *
+ * ## Acciones sobre hoteles
+ * - Navegar a edición: `routerLink` directo.
+ * - Habilitar/deshabilitar: `toggleStatus()` con diálogo de confirmación.
+ * - Eliminar: `deleteHotel()` con diálogo de confirmación (acción irreversible).
+ */
 @Component({
-  selector: 'app-hotel-list',
   standalone: true,
   imports: [
     CommonModule, RouterLink, FormsModule,
@@ -237,6 +253,12 @@ export class HotelListComponent implements OnInit {
       'https://placehold.co/600x400?text=Hotel';
   }
 
+  /**
+   * Elimina un hotel tras confirmación del usuario mediante `ConfirmDialogComponent`.
+   * Si el usuario cancela el diálogo, la operación no se ejecuta.
+   *
+   * @param hotel Hotel a eliminar (se usa el nombre en el mensaje de confirmación).
+   */
   deleteHotel(hotel: Hotel): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
@@ -256,6 +278,10 @@ export class HotelListComponent implements OnInit {
     });
   }
 
+  /**
+   * Alterna el estado `active`/`inactive` del hotel tras confirmación.
+   * El texto del diálogo cambia dinámicamente según el estado actual.
+   */
   toggleStatus(hotel: Hotel): void {
     const action = hotel.status === 'active' ? 'deshabilitar' : 'habilitar';
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {

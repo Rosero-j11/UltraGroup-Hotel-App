@@ -4,6 +4,22 @@ import { Observable, tap, catchError, throwError, of, delay } from 'rxjs';
 import { Reservation, CreateReservationDto } from '../models';
 import { v4 as uuidv4 } from 'uuid';
 
+/**
+ * Servicio para gestión del ciclo de vida de reservas.
+ *
+ * Además del patrón común (Signals + localStorage cache-first),
+ * este servicio incluye:
+ *
+ * - `_lastCreated` signal: guarda la última reserva creada para que
+ *   `BookingConfirmationComponent` la muestre sin depender de la URL.
+ * - `calculateNights()`: lógica pura que calcula noches entre dos fechas ISO.
+ * - `createReservation()`: construye el costo total `(baseCost + taxes) * nights`
+ *   antes de persistir.
+ *
+ * ## Estrategia de merge en `loadReservations`
+ * Cuando el JSON de assets se carga, se fusiona con las reservas ya en memoria
+ * (creadas en la sesión actual) para no sobreescribir datos locales nuevos.
+ */
 @Injectable({ providedIn: 'root' })
 export class ReservationService {
   private readonly http = inject(HttpClient);
@@ -24,9 +40,8 @@ export class ReservationService {
     this._reservations().filter(r => r.status === 'confirmed')
   );
 
+  /** @see HotelService#persist */
   private persist(): void {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._reservations()));
     } catch (e) {
       console.warn('[ReservationService] No se pudo persistir en localStorage:', e);
     }
@@ -71,6 +86,17 @@ export class ReservationService {
     return this._reservations().find(r => r.id === id);
   }
 
+  /**
+   * Crea una nueva reserva calculando el costo total dinámicamente.
+   * Formula: `totalCost = (baseCost + taxes) * nights`
+   * - `baseCost` y `taxes` se obtienen de la habitación seleccionada.
+   * - `nights` se calcula con `calculateNights(checkIn, checkOut)`.
+   *
+   * La reserva se crea siempre con estado `confirmed` (no hay flujo de aprobación).
+   *
+   * @param dto Datos del formulario de booking incluyendo huésped y contacto de emergencia.
+   * @returns Observable con la reserva creada y persistida.
+   */
   createReservation(dto: CreateReservationDto): Observable<Reservation> {
     this._loading.set(true);
     const nights = this.calculateNights(dto.checkIn, dto.checkOut);
@@ -99,6 +125,10 @@ export class ReservationService {
     );
   }
 
+  /**
+   * Cancela una reserva cambiando su estado a `cancelled`.
+   * No elimina el registro del sistema (auditabilidad de reservas canceladas).
+   */
   cancelReservation(id: string): Observable<Reservation> {
     const reservation = this._reservations().find(r => r.id === id);
     if (!reservation) return throwError(() => new Error('Reserva no encontrada'));
@@ -116,6 +146,15 @@ export class ReservationService {
     );
   }
 
+  /**
+   * Calcula el número de noches entre dos fechas ISO.
+   * Garantiza mínimo 1 noche con `Math.max(1, ...)` para evitar costos negativos
+   * cuando las fechas son iguales o el orden es incorrecto.
+   *
+   * @param checkIn  Fecha de entrada (string ISO).
+   * @param checkOut Fecha de salida (string ISO).
+   * @returns Número de noches (mínimo 1).
+   */
   private calculateNights(checkIn: string, checkOut: string): number {
     const start = new Date(checkIn);
     const end = new Date(checkOut);
@@ -123,6 +162,10 @@ export class ReservationService {
     return Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   }
 
+  /**
+   * Limpia el signal `_lastCreated` una vez que la pantalla de confirmación
+   * ha leído y mostrado la reserva.
+   */
   clearLastCreated(): void {
     this._lastCreated.set(null);
   }

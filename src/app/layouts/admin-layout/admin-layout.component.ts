@@ -128,6 +128,23 @@ interface NavItem {
     }
   `]
 })
+/**
+ * Layout del panel de administración. Contiene la barra de navegación lateral
+ * (sidenav) y la toolbar superior, con soporte responsivo mediante `BreakpointObserver`.
+ *
+ * ## Comportamiento responsivo
+ * - **Escritorio** (>768px): sidenav en modo `side` (fijo, siempre visible), abierto por defecto.
+ * - **Móvil** (<768px): sidenav en modo `over` (superpuesto), cerrado por defecto.
+ *
+ * ## Gestión del ciclo de vida (sin ngOnDestroy)
+ * La suscripción a `BreakpointObserver` usa `takeUntilDestroyed()` del paquete
+ * `@angular/core/rxjs-interop`, que se encarga de desuscribirse automáticamente
+ * cuando el componente se destruye. Elimina la necesidad de implementar `OnDestroy`
+ * manualmente con un `Subject` + `takeUntil`.
+ *
+ * ## `RouterOutlet`
+ * El outlet renderiza las rutas hijas de `ADMIN_ROUTES` dentro del área de contenido.
+ */
 export class AdminLayoutComponent {
   private readonly breakpoints = inject(BreakpointObserver);
 
@@ -152,6 +169,7 @@ export class AdminLayoutComponent {
       });
   }
 
+  /** Alterna el estado abierto/cerrado del sidenav al pulsar el botón hamburguesa. */
   toggleSidenav(): void {
     this.sidenavOpen.update(v => !v);
   }

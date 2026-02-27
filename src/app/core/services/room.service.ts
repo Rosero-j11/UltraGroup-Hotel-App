@@ -4,6 +4,16 @@ import { Observable, tap, catchError, throwError, of, delay } from 'rxjs';
 import { Room, CreateRoomDto, UpdateRoomDto, RoomStatus } from '../models';
 import { v4 as uuidv4 } from 'uuid';
 
+/**
+ * Servicio para gestión de habitaciones, siguiendo el mismo patrón
+ * que `HotelService`: Signals + localStorage cache-first + Mock API con `of()`.
+ *
+ * Las habitaciones siempre están asociadas a un hotel mediante `hotelId`.
+ * Los filtros `getRoomsByHotel` y `getActiveRoomsByHotel` permiten obtener
+ * solo las habitaciones relevantes para cada contexto.
+ *
+ * @see HotelService para documentación del patrón común.
+ */
 @Injectable({ providedIn: 'root' })
 export class RoomService {
   private readonly http = inject(HttpClient);
@@ -26,9 +36,8 @@ export class RoomService {
     this._rooms().filter(r => r.status === 'active')
   );
 
+  /** @see HotelService#persist */
   private persist(): void {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._rooms()));
     } catch (e) {
       console.warn('[RoomService] No se pudo persistir en localStorage:', e);
     }
@@ -63,10 +72,12 @@ export class RoomService {
     );
   }
 
+  /** Retorna todas las habitaciones de un hotel independientemente de su estado. */
   getRoomsByHotel(hotelId: string): Room[] {
     return this._rooms().filter(r => r.hotelId === hotelId);
   }
 
+  /** Retorna solo habitaciones activas de un hotel. Usado en el portal del viajero. */
   getActiveRoomsByHotel(hotelId: string): Room[] {
     return this._rooms().filter(r => r.hotelId === hotelId && r.status === 'active');
   }
@@ -133,6 +144,10 @@ export class RoomService {
     return this.updateRoom({ id, status: newStatus });
   }
 
+  /**
+   * Elimina una habitación del signal usando `filter()` para inmutabilidad.
+   * @param id Identificador de la habitación a eliminar.
+   */
   deleteRoom(id: string): Observable<void> {
     return of(void 0).pipe(
       delay(300),

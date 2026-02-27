@@ -360,6 +360,31 @@ import { Hotel, Room } from '../../../core/models';
     .total-highlight { font-size: 1rem; font-weight: 600; color: #1a237e; }
   `]
 })
+/**
+ * Componente de reserva de habitación — flujo de 3 pasos (MatStepper).
+ *
+ * ## Parámetros de entrada (query params)
+ * Recibe los datos de contexto mediante query params en la URL:
+ * `?hotelId=X&roomId=Y&checkIn=YYYY-MM-DD&checkOut=YYYY-MM-DD`
+ *
+ * ## Flujo de carga de datos
+ * Si los signals de hoteles/habitaciones están vacíos al iniciar (recarga directa de página),
+ * `ngOnInit()` lanza ambas cargas en paralelo con un contador `pending` que espera a que
+ * ambas terminen antes de resolver hotel y habitación desde los signals.
+ *
+ * ## Stepper lineal
+ * - Paso 1: Datos del huésped principal (`guestForm`)
+ * - Paso 2: Contacto de emergencia (`emergencyForm`)
+ * - Paso 3: Resumen + botón de confirmación
+ *
+ * ## Cálculo de costos en tiempo real
+ * El computed `nights()` recalcula las noches cada vez que cambian `checkIn`/`checkOut`.
+ * El total se muestra directamente en el template: `baseCost * (1 + taxRate/100) * nights()`.
+ *
+ * ## Conversión de fechas
+ * `birthDate` en `guestForm` es un `Date` nativo del DatePicker. Al construir el DTO,
+ * se convierte a string ISO `YYYY-MM-DD` con `.toISOString().split('T')[0]`.
+ */
 export class BookingComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -419,6 +444,12 @@ export class BookingComponent implements OnInit {
     if (needRooms) this.roomService.loadRooms().subscribe({ next: done, error: done });
   }
 
+  /**
+   * Construye el DTO final y llama al servicio de reservas.
+   * - Convierte `birthDate` (Date) a string ISO.
+   * - Calcula `taxes = baseCost * taxRate / 100`.
+   * - Navega a la pantalla de confirmación pasando `reservationId` como query param.
+   */
   confirmBooking(): void {
     if (this.guestForm.invalid || this.emergencyForm.invalid) return;
     const hotel = this.hotel();

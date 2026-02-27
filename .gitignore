@@ -42,3 +42,7 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Archivos privados (notas de entrevista, documentación personal)
+ENTREVISTA_GUIA.md
+NOTAS_*.md

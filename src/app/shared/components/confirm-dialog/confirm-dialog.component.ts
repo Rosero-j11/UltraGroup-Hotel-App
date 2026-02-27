@@ -3,6 +3,10 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
+/**
+ * Datos que se pasan al diálogo mediante el token `MAT_DIALOG_DATA`.
+ * Todos los campos son opcionales excepto `title` y `message`.
+ */
 export interface ConfirmDialogData {
   title: string;
   message: string;
@@ -11,8 +15,21 @@ export interface ConfirmDialogData {
   type?: 'danger' | 'warning' | 'info';
 }
 
+/**
+ * Diálogo de confirmación genérico reutilizable en toda la aplicación.
+ *
+ * Se abre con `MatDialog.open(ConfirmDialogComponent, { data: ConfirmDialogData })`.
+ * Retorna `true` si el usuario confirma, `undefined` si cierra con Escape o clic fuera.
+ *
+ * @example
+ * const ref = this.dialog.open(ConfirmDialogComponent, {
+ *   data: { title: 'Eliminar', message: '¿Seguro?', confirmText: 'Sí, eliminar', type: 'danger' }
+ * });
+ * ref.afterClosed().subscribe(confirmed => {
+ *   if (confirmed) this.service.delete(id);
+ * });
+ */
 @Component({
-  selector: 'app-confirm-dialog',
   standalone: true,
   imports: [MatDialogModule, MatButtonModule, MatIconModule],
   template: `
