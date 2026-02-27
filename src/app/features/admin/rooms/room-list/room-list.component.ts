@@ -161,6 +161,10 @@ const ROOM_TYPE_LABELS: Record<string, string> = {
                             (click)="toggleStatus(room)">
                             <mat-icon>{{ room.status === 'active' ? 'toggle_on' : 'toggle_off' }}</mat-icon>
                           </button>
+                          <button mat-icon-button color="warn" matTooltip="Eliminar habitación"
+                            (click)="deleteRoom(room)">
+                            <mat-icon>delete</mat-icon>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -252,6 +256,25 @@ export class RoomListComponent implements OnInit {
 
   onImageError(event: Event): void {
     (event.target as HTMLImageElement).src = 'https://placehold.co/100x80?text=Hab';
+  }
+
+  deleteRoom(room: Room): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Eliminar habitación',
+        message: `¿Estás seguro de que deseas eliminar esta habitación de tipo ${this.getRoomTypeLabel(room.type)}? Esta acción no se puede deshacer.`,
+        confirmText: 'Eliminar',
+        type: 'danger',
+      }
+    });
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.roomService.deleteRoom(room.id).subscribe({
+          next: () => this.notification.success('Habitación eliminada correctamente'),
+          error: () => this.notification.error('Error al eliminar la habitación')
+        });
+      }
+    });
   }
 
   toggleStatus(room: Room): void {

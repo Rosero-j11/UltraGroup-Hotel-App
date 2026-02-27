@@ -136,6 +136,17 @@ export class HotelService {
     return this.updateHotel({ id, status: newStatus });
   }
 
+  deleteHotel(id: string): Observable<void> {
+    return of(void 0).pipe(
+      delay(300),
+      tap(() => {
+        this._hotels.update(hotels => hotels.filter(h => h.id !== id));
+        this.persist();
+      }),
+      catchError(err => throwError(() => err))
+    );
+  }
+
   getAvailableCities(): string[] {
     const cities = this._hotels()
       .filter(h => h.status === 'active')

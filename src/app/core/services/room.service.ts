@@ -132,5 +132,16 @@ export class RoomService {
     const newStatus: RoomStatus = room.status === 'active' ? 'inactive' : 'active';
     return this.updateRoom({ id, status: newStatus });
   }
+
+  deleteRoom(id: string): Observable<void> {
+    return of(void 0).pipe(
+      delay(300),
+      tap(() => {
+        this._rooms.update(rooms => rooms.filter(r => r.id !== id));
+        this.persist();
+      }),
+      catchError(err => throwError(() => err))
+    );
+  }
 }
 

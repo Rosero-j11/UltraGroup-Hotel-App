@@ -130,6 +130,10 @@ import { Hotel } from '../../../../core/models';
                     (click)="toggleStatus(hotel)">
                     <mat-icon>{{ hotel.status === 'active' ? 'toggle_on' : 'toggle_off' }}</mat-icon>
                   </button>
+                  <button mat-icon-button color="warn" matTooltip="Eliminar hotel"
+                    (click)="deleteHotel(hotel)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
                 </mat-card-actions>
               </mat-card>
             }
@@ -231,6 +235,25 @@ export class HotelListComponent implements OnInit {
   onImageError(event: Event): void {
     (event.target as HTMLImageElement).src =
       'https://placehold.co/600x400?text=Hotel';
+  }
+
+  deleteHotel(hotel: Hotel): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Eliminar hotel',
+        message: `¿Estás seguro de que deseas eliminar el hotel "${hotel.name}"? Esta acción no se puede deshacer.`,
+        confirmText: 'Eliminar',
+        type: 'danger',
+      }
+    });
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.hotelService.deleteHotel(hotel.id).subscribe({
+          next: () => this.notification.success(`Hotel "${hotel.name}" eliminado correctamente`),
+          error: () => this.notification.error('Error al eliminar el hotel')
+        });
+      }
+    });
   }
 
   toggleStatus(hotel: Hotel): void {
