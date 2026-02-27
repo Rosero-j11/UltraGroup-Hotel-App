@@ -1,6 +1,6 @@
 {
-  "installCommand": "npm ci",
-  "buildCommand": "npx ng build --configuration production --no-analytics",
+  "installCommand": "npm ci --legacy-peer-deps",
+  "buildCommand": "npm run build -- --no-progress",
   "outputDirectory": "dist/ultragroup-hotel-app/browser",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
