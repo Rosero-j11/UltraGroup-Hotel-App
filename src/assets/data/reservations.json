@@ -1,0 +1,164 @@
+[
+  {
+    "id": "res-a1b2c3d4",
+    "hotelId": "hotel-001",
+    "hotelName": "Hotel Gran Reserva Bogotá",
+    "roomId": "room-001",
+    "roomType": "double",
+    "checkIn": "2026-03-10",
+    "checkOut": "2026-03-14",
+    "guest": {
+      "fullName": "Carlos Andrés Ramírez",
+      "birthDate": "1988-07-15",
+      "gender": "M",
+      "documentType": "CC",
+      "documentNumber": "79845632",
+      "email": "carlos.ramirez@email.com",
+      "phone": "+57 310 234 5678"
+    },
+    "emergencyContact": {
+      "fullName": "María Ramírez",
+      "phone": "+57 315 876 5432"
+    },
+    "baseCost": 350000,
+    "taxes": 66500,
+    "totalCost": 1666000,
+    "status": "confirmed",
+    "createdAt": "2026-02-15T10:00:00.000Z"
+  },
+  {
+    "id": "res-e5f6g7h8",
+    "hotelId": "hotel-002",
+    "hotelName": "Hotel Medellín Plaza",
+    "roomId": "room-005",
+    "roomType": "family",
+    "checkIn": "2026-04-05",
+    "checkOut": "2026-04-10",
+    "guest": {
+      "fullName": "Valeria Ospina Torres",
+      "birthDate": "1992-03-22",
+      "gender": "F",
+      "documentType": "CC",
+      "documentNumber": "52698741",
+      "email": "valeria.ospina@gmail.com",
+      "phone": "+57 320 111 2233"
+    },
+    "emergencyContact": {
+      "fullName": "Juan Ospina",
+      "phone": "+57 301 445 6677"
+    },
+    "baseCost": 420000,
+    "taxes": 79800,
+    "totalCost": 2499000,
+    "status": "confirmed",
+    "createdAt": "2026-02-20T14:30:00.000Z"
+  },
+  {
+    "id": "res-i9j0k1l2",
+    "hotelId": "hotel-003",
+    "hotelName": "Cartagena Colonial Suites",
+    "roomId": "room-007",
+    "roomType": "double",
+    "checkIn": "2026-03-20",
+    "checkOut": "2026-03-23",
+    "guest": {
+      "fullName": "Sebastián Morales Castro",
+      "birthDate": "1995-11-08",
+      "gender": "M",
+      "documentType": "PASSPORT",
+      "documentNumber": "AB123456",
+      "email": "smorales@empresa.co",
+      "phone": "+57 318 999 0011"
+    },
+    "emergencyContact": {
+      "fullName": "Luisa Morales",
+      "phone": "+57 311 222 3344"
+    },
+    "baseCost": 450000,
+    "taxes": 85500,
+    "totalCost": 1606500,
+    "status": "confirmed",
+    "createdAt": "2026-02-22T09:15:00.000Z"
+  },
+  {
+    "id": "res-m3n4o5p6",
+    "hotelId": "hotel-004",
+    "hotelName": "Santa Marta Beach Resort",
+    "roomId": "room-010",
+    "roomType": "double",
+    "checkIn": "2026-05-01",
+    "checkOut": "2026-05-05",
+    "guest": {
+      "fullName": "Diana Carolina Pérez",
+      "birthDate": "1990-06-30",
+      "gender": "F",
+      "documentType": "CC",
+      "documentNumber": "35987412",
+      "email": "diana.perez@correo.com",
+      "phone": "+57 314 555 6677"
+    },
+    "emergencyContact": {
+      "fullName": "Roberto Pérez",
+      "phone": "+57 316 788 9900"
+    },
+    "baseCost": 320000,
+    "taxes": 60800,
+    "totalCost": 1523200,
+    "status": "pending",
+    "createdAt": "2026-02-25T16:45:00.000Z"
+  },
+  {
+    "id": "res-q7r8s9t0",
+    "hotelId": "hotel-001",
+    "hotelName": "Hotel Gran Reserva Bogotá",
+    "roomId": "room-002",
+    "roomType": "suite",
+    "checkIn": "2026-02-10",
+    "checkOut": "2026-02-12",
+    "guest": {
+      "fullName": "Andrés Felipe Gómez",
+      "birthDate": "1985-01-20",
+      "gender": "M",
+      "documentType": "CE",
+      "documentNumber": "CE-845621",
+      "email": "afgomez@business.com",
+      "phone": "+57 312 300 4500"
+    },
+    "emergencyContact": {
+      "fullName": "Patricia Gómez",
+      "phone": "+57 313 600 7800"
+    },
+    "baseCost": 750000,
+    "taxes": 142500,
+    "totalCost": 1785000,
+    "status": "cancelled",
+    "createdAt": "2026-01-30T11:00:00.000Z"
+  },
+  {
+    "id": "res-u1v2w3x4",
+    "hotelId": "hotel-006",
+    "hotelName": "Bucaramanga Sky Hotel",
+    "roomId": "room-013",
+    "roomType": "double",
+    "checkIn": "2026-03-28",
+    "checkOut": "2026-03-30",
+    "guest": {
+      "fullName": "Natalia Vargas Suárez",
+      "birthDate": "1993-09-14",
+      "gender": "F",
+      "documentType": "CC",
+      "documentNumber": "63258741",
+      "email": "nvargas@tech.io",
+      "phone": "+57 317 123 4567"
+    },
+    "emergencyContact": {
+      "fullName": "Hernán Vargas",
+      "phone": "+57 319 987 6543"
+    },
+    "baseCost": 260000,
+    "taxes": 49400,
+    "totalCost": 618800,
+    "status": "confirmed",
+    "createdAt": "2026-02-26T08:00:00.000Z"
+  }
+]

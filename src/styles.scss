@@ -1,1 +1,97 @@
-/* You can add global styles to this file, and also import other style files */
+// Include theming for Angular Material with `mat.theme()`.
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+/* ── Paleta de colores UltraGroup ── */
+:root {
+  --color-title:       #1A365D; /* Azul Profundo   - H1, nombres de hoteles       */
+  --color-subtitle:    #C9A227; /* Dorado Cálido    - H2, H3, precios destacados   */
+  --color-body:        #2D3748; /* Gris Carbón      - Párrafos, descripciones      */
+  --color-caption:     #718096; /* Gris Piedra      - Fechas, metadatos, auxiliares*/
+  --color-cta:         #E07A5F; /* Coral Suave      - Botones CTA, alertas         */
+  --color-bg:          #F7FAFC; /* Blanco Hueso     - Fondo principal              */
+  --color-bg-card:     #E6FFFA; /* Azul Marino Claro- Tarjetas, secciones destacadas*/
+}
+
+body {
+  color-scheme: light;
+  background-color: #F7FAFC;
+  color: #2D3748;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+  height: 100%;
+}
+
+/* Tipografía base */
+h1 { font-size: 2rem; font-weight: 700; color: var(--color-title); }
+h2 { font-size: 1.5rem; font-weight: 600; color: var(--color-subtitle); }
+h3 { font-size: 1.25rem; font-weight: 600; color: var(--color-subtitle); }
+p, li { font-size: 1rem; font-weight: 400; color: var(--color-body); }
+
+* {
+  box-sizing: border-box;
+}
+
+/* Custom Snackbar Notifications */
+.snackbar-success {
+  --mdc-snackbar-container-color: #2e7d32 !important;
+  --mdc-snackbar-supporting-text-color: white !important;
+  .mat-mdc-button.mat-mdc-snack-bar-action { color: #a5d6a7 !important; }
+}
+.snackbar-error {
+  --mdc-snackbar-container-color: #c62828 !important;
+  --mdc-snackbar-supporting-text-color: white !important;
+  .mat-mdc-button.mat-mdc-snack-bar-action { color: #ffcdd2 !important; }
+}
+.snackbar-warning {
+  --mdc-snackbar-container-color: #e65100 !important;
+  --mdc-snackbar-supporting-text-color: white !important;
+}
+.snackbar-info {
+  --mdc-snackbar-container-color: #1565c0 !important;
+  --mdc-snackbar-supporting-text-color: white !important;
+}
+
+/* Inputs readonly que abren datepicker: cursor pointer */
+input[readonly] { cursor: pointer !important; }
+
+/* Responsive: form fields full width en mobile */
+@media (max-width: 599px) {
+  .mat-mdc-form-field { width: 100%; }
+  h1 { font-size: 1.5rem !important; }
+  h2 { font-size: 1.2rem !important; }
+}
+
+/* Material Card elevation */
+.mat-mdc-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Form field improvements */
+.mat-mdc-form-field {
+  .mat-mdc-form-field-icon-prefix {
+    color: #888;
+    padding-right: 4px;
+  }
+}
+
+/* Scrollbar customization */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #c5cae9; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9fa8da; }

@@ -1,0 +1,42 @@
+name: CI/CD — UltraGroup Hotel App
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  # ─────────────────────────────────────────
+  # JOB 1: Build + Test
+  # ─────────────────────────────────────────
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar proyecto (producción)
+        run: npm run build -- --configuration production
+
+      - name: Ejecutar tests unitarios (headless)
+        run: npm run test -- --watch=false --browsers=ChromeHeadless --no-progress
+
+      - name: Subir artefacto de build
+        uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+        with:
+          name: dist-ultragroup
+          path: dist/
+          retention-days: 7
