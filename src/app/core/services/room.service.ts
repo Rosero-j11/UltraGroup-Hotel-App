@@ -27,7 +27,11 @@ export class RoomService {
   );
 
   private persist(): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._rooms()));
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._rooms()));
+    } catch (e) {
+      console.warn('[RoomService] No se pudo persistir en localStorage:', e);
+    }
   }
 
   loadRooms(): Observable<Room[]> {

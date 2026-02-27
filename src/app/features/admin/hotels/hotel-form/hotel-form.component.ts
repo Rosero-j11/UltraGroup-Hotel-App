@@ -212,6 +212,7 @@ export class HotelFormComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
+    if (this.submitting()) return; // evitar doble envío
     this.submitting.set(true);
     const value = this.form.getRawValue();
 

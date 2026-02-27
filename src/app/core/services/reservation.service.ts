@@ -25,7 +25,11 @@ export class ReservationService {
   );
 
   private persist(): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._reservations()));
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._reservations()));
+    } catch (e) {
+      console.warn('[ReservationService] No se pudo persistir en localStorage:', e);
+    }
   }
 
   loadReservations(): Observable<Reservation[]> {

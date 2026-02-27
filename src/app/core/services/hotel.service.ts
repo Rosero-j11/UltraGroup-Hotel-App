@@ -28,9 +28,13 @@ export class HotelService {
 
   readonly hotelCount = computed(() => this._hotels().length);
 
-  /** Guarda el estado actual en localStorage */
+  /** Guarda el estado actual en localStorage (silencia errores de quota/privado) */
   private persist(): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._hotels()));
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._hotels()));
+    } catch (e) {
+      console.warn('[HotelService] No se pudo persistir en localStorage:', e);
+    }
   }
 
   loadHotels(): Observable<Hotel[]> {
