@@ -8,13 +8,12 @@ import { v4 as uuidv4 } from 'uuid';
 export class HotelService {
   private readonly http = inject(HttpClient);
   private readonly dataUrl = 'assets/data/hotels.json';
+  private readonly STORAGE_KEY = 'ug_hotels';
 
   constructor() {
-    // Carga automática al iniciar para que los datos estén disponibles de inmediato
     this.loadHotels().subscribe();
   }
 
-  // --- State with Angular Signals ---
   private readonly _hotels = signal<Hotel[]>([]);
   private readonly _loading = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
@@ -29,13 +28,32 @@ export class HotelService {
 
   readonly hotelCount = computed(() => this._hotels().length);
 
+  /** Guarda el estado actual en localStorage */
+  private persist(): void {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._hotels()));
+  }
+
   loadHotels(): Observable<Hotel[]> {
+    // Si ya hay datos en localStorage, los usa directamente (persiste entre recargas)
+    const cached = localStorage.getItem(this.STORAGE_KEY);
+    if (cached) {
+      try {
+        const hotels = JSON.parse(cached) as Hotel[];
+        this._hotels.set(hotels);
+        this._loading.set(false);
+        return of(hotels);
+      } catch {
+        localStorage.removeItem(this.STORAGE_KEY);
+      }
+    }
+    // Primera carga: obtiene del JSON y guarda en localStorage
     this._loading.set(true);
     this._error.set(null);
     return this.http.get<Hotel[]>(this.dataUrl).pipe(
       delay(400),
       tap(hotels => {
         this._hotels.set(hotels);
+        this.persist();
         this._loading.set(false);
       }),
       catchError(err => {
@@ -69,6 +87,7 @@ export class HotelService {
       delay(500),
       tap(hotel => {
         this._hotels.update(hotels => [...hotels, hotel]);
+        this.persist();
         this._loading.set(false);
       }),
       catchError(err => {
@@ -96,6 +115,7 @@ export class HotelService {
         this._hotels.update(hotels =>
           hotels.map(h => (h.id === hotel.id ? hotel : h))
         );
+        this.persist();
         this._loading.set(false);
       }),
       catchError(err => {

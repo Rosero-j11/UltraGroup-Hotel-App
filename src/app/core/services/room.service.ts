@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class RoomService {
   private readonly http = inject(HttpClient);
   private readonly dataUrl = 'assets/data/rooms.json';
+  private readonly STORAGE_KEY = 'ug_rooms';
 
   constructor() {
     this.loadRooms().subscribe();
@@ -25,13 +26,29 @@ export class RoomService {
     this._rooms().filter(r => r.status === 'active')
   );
 
+  private persist(): void {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._rooms()));
+  }
+
   loadRooms(): Observable<Room[]> {
+    const cached = localStorage.getItem(this.STORAGE_KEY);
+    if (cached) {
+      try {
+        const rooms = JSON.parse(cached) as Room[];
+        this._rooms.set(rooms);
+        this._loading.set(false);
+        return of(rooms);
+      } catch {
+        localStorage.removeItem(this.STORAGE_KEY);
+      }
+    }
     this._loading.set(true);
     this._error.set(null);
     return this.http.get<Room[]>(this.dataUrl).pipe(
       delay(400),
       tap(rooms => {
         this._rooms.set(rooms);
+        this.persist();
         this._loading.set(false);
       }),
       catchError(err => {
@@ -67,6 +84,7 @@ export class RoomService {
       delay(500),
       tap(room => {
         this._rooms.update(rooms => [...rooms, room]);
+        this.persist();
         this._loading.set(false);
       }),
       catchError(err => {
@@ -94,6 +112,7 @@ export class RoomService {
         this._rooms.update(rooms =>
           rooms.map(r => (r.id === room.id ? room : r))
         );
+        this.persist();
         this._loading.set(false);
       }),
       catchError(err => {
@@ -110,3 +129,4 @@ export class RoomService {
     return this.updateRoom({ id, status: newStatus });
   }
 }
+

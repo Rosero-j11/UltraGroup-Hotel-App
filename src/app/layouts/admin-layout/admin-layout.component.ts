@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,6 +7,8 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface NavItem {
   label: string;
@@ -26,8 +28,9 @@ interface NavItem {
     <mat-sidenav-container class="admin-container">
       <mat-sidenav
         #sidenav
-        mode="side"
+        [mode]="isMobile() ? 'over' : 'side'"
         [opened]="sidenavOpen()"
+        (openedChange)="sidenavOpen.set($event)"
         class="admin-sidenav">
         <div class="sidenav-header">
           <mat-icon class="brand-icon">hotel</mat-icon>
@@ -41,6 +44,7 @@ interface NavItem {
               [routerLink]="item.route"
               routerLinkActive="active-link"
               [routerLinkActiveOptions]="{ exact: false }"
+              (click)="onNavItemClick()"
               class="nav-item">
               <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
               <span matListItemTitle>{{ item.label }}</span>
@@ -48,7 +52,8 @@ interface NavItem {
           }
         </mat-nav-list>
         <div class="sidenav-footer">
-          <a mat-list-item routerLink="/traveler" class="switch-profile">
+          <a mat-list-item routerLink="/traveler" class="switch-profile"
+             (click)="onNavItemClick()">
             <mat-icon matListItemIcon>person</mat-icon>
             <span matListItemTitle>Perfil Viajero</span>
           </a>
@@ -64,7 +69,7 @@ interface NavItem {
           <span class="spacer"></span>
           <a mat-button routerLink="/traveler">
             <mat-icon>flight_takeoff</mat-icon>
-            Modo Viajero
+            <span class="toolbar-link-label">Modo Viajero</span>
           </a>
         </mat-toolbar>
         <main class="content-area">
@@ -91,7 +96,6 @@ interface NavItem {
     .brand-name { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; margin-top: 0.4rem; }
     .brand-sub { font-size: 0.72rem; color: rgba(255,255,255,0.6); }
     .nav-list { padding: 0.5rem 0; flex: 1; }
-    /* ── Colores blancos nav items ── */
     .nav-item { color: white !important; margin: 2px 8px; border-radius: 8px; }
     .nav-item:hover { background: rgba(255,255,255,0.1) !important; }
     .nav-item .mat-icon, .nav-item mat-icon { color: white !important; }
@@ -103,15 +107,21 @@ interface NavItem {
     .switch-profile { color: white !important; margin: 2px 8px; border-radius: 8px; }
     .switch-profile .mat-icon, .switch-profile mat-icon { color: white !important; }
     .switch-profile .mdc-list-item__primary-text { color: white !important; }
-    /* ── Toolbar ── */
     .admin-toolbar { position: sticky; top: 0; z-index: 100; background: #1A365D !important; color: white !important; }
     .admin-toolbar .mat-icon, .admin-toolbar mat-icon { color: white !important; }
     .toolbar-title { font-weight: 500; font-size: 0.95rem; margin-left: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
+    .toolbar-link-label { display: none; }
     .spacer { flex: 1; }
-    /* ── Elimina esquina blanca del sidenav-container ── */
     .admin-container { background: #1A365D !important; }
     .admin-toolbar button, .admin-toolbar a { color: white !important; }
     .content-area { padding: 1rem; min-height: calc(100vh - 64px); background: #F7FAFC; }
+    /* Mobile overlay: el sidenav cubre todo el ancho y se superpone */
+    @media (max-width: 768px) {
+      .admin-sidenav { width: 85vw; max-width: 300px; }
+    }
+    @media (min-width: 480px) {
+      .toolbar-link-label { display: inline; }
+    }
     @media (min-width: 640px) {
       .content-area { padding: 1.5rem; }
       .toolbar-title { font-size: 1.05rem; }
@@ -119,6 +129,9 @@ interface NavItem {
   `]
 })
 export class AdminLayoutComponent {
+  private readonly breakpoints = inject(BreakpointObserver);
+
+  isMobile = signal(false);
   sidenavOpen = signal(true);
 
   navItems: NavItem[] = [
@@ -127,7 +140,26 @@ export class AdminLayoutComponent {
     { label: 'Reservas', icon: 'book_online', route: '/admin/reservations' },
   ];
 
+  constructor() {
+    // Detecta si es móvil y ajusta el sidenav automáticamente
+    this.breakpoints
+      .observe('(max-width: 768px)')
+      .pipe(takeUntilDestroyed())
+      .subscribe(result => {
+        this.isMobile.set(result.matches);
+        // En móvil el menú empieza cerrado; en escritorio abierto
+        this.sidenavOpen.set(!result.matches);
+      });
+  }
+
   toggleSidenav(): void {
     this.sidenavOpen.update(v => !v);
+  }
+
+  /** Cierra el sidenav al navegar (solo en móvil, donde es overlay) */
+  onNavItemClick(): void {
+    if (this.isMobile()) {
+      this.sidenavOpen.set(false);
+    }
   }
 }

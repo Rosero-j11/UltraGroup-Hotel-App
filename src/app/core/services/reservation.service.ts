@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class ReservationService {
   private readonly http = inject(HttpClient);
   private readonly dataUrl = 'assets/data/reservations.json';
+  private readonly STORAGE_KEY = 'ug_reservations';
 
   private readonly _reservations = signal<Reservation[]>([]);
   private readonly _loading = signal<boolean>(false);
@@ -23,16 +24,31 @@ export class ReservationService {
     this._reservations().filter(r => r.status === 'confirmed')
   );
 
+  private persist(): void {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._reservations()));
+  }
+
   loadReservations(): Observable<Reservation[]> {
+    const cached = localStorage.getItem(this.STORAGE_KEY);
+    if (cached) {
+      try {
+        const reservations = JSON.parse(cached) as Reservation[];
+        this._reservations.set(reservations);
+        this._loading.set(false);
+        return of(reservations);
+      } catch {
+        localStorage.removeItem(this.STORAGE_KEY);
+      }
+    }
     this._loading.set(true);
     this._error.set(null);
     return this.http.get<Reservation[]>(this.dataUrl).pipe(
       delay(400),
       tap(reservations => {
-        // Preservar reservas en-memoria que no existen en el JSON (ej: recién creadas)
         const jsonIds = new Set(reservations.map(r => r.id));
         const inMemoryOnly = this._reservations().filter(r => !jsonIds.has(r.id));
         this._reservations.set([...reservations, ...inMemoryOnly]);
+        this.persist();
         this._loading.set(false);
       }),
       catchError(err => {
@@ -69,6 +85,7 @@ export class ReservationService {
       tap(reservation => {
         this._reservations.update(reservations => [...reservations, reservation]);
         this._lastCreated.set(reservation);
+        this.persist();
         this._loading.set(false);
       }),
       catchError(err => {
@@ -89,6 +106,7 @@ export class ReservationService {
         this._reservations.update(reservations =>
           reservations.map(r => (r.id === res.id ? res : r))
         );
+        this.persist();
         this._loading.set(false);
       })
     );
@@ -105,3 +123,4 @@ export class ReservationService {
     this._lastCreated.set(null);
   }
 }
+
