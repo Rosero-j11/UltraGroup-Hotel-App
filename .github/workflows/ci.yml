@@ -30,8 +30,8 @@ jobs:
       - name: Compilar proyecto (producción)
         run: npm run build -- --configuration production
 
-      - name: Ejecutar tests unitarios (headless)
-        run: npm run test -- --watch=false --browsers=ChromeHeadless --no-progress
+      - name: Ejecutar tests unitarios
+        run: npm run test -- --watch=false
 
       - name: Subir artefacto de build
         uses: actions/upload-artifact@v4

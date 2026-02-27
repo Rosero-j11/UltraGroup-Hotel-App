@@ -1,7 +1,7 @@
 # UltraGroup Hotel App
 
 Aplicación web desarrollada como prueba técnica para **UltraGroup** — posición Frontend Developer.  
-Construida con **Angular 19+**, Angular Material y buenas prácticas de arquitectura frontend moderna.
+Construida con **Angular 21**, Angular Material y buenas prácticas de arquitectura frontend moderna.
 
 ---
 
@@ -31,9 +31,9 @@ Construida con **Angular 19+**, Angular Material y buenas prácticas de arquitec
 
 | Herramienta | Versión mínima |
 |---|---|
-| Node.js | 18.x o superior |
-| npm | 9.x o superior |
-| Angular CLI | 17.x o superior |
+| Node.js | 20.x o superior |
+| npm | 10.x o superior |
+| Angular CLI | 21.x o superior |
 
 ```bash
 npm install -g @angular/cli
@@ -142,11 +142,9 @@ Perfil: **Agencia de viajes**
 
 | Sección | Funcionalidades |
 |---|---|
-| **Hoteles** | Listar, crear, editar, activar/desactivar. Filtros por nombre y estado. |
-| **Habitaciones** | Listar todas las habitaciones con filtros por hotel/tipo/estado. Crear, editar, activar/desactivar. Cálculo automático de costo total (base + impuestos). |
-| **Reservas** | Listar todas las reservas con filtros. Ver detalle completo (huésped, contacto de emergencia, desglose de costos). |
-
-> **Regla de negocio:** No es posible eliminar hoteles ni habitaciones — solo activar/desactivar. Esto garantiza la integridad de las reservas históricas.
+| **Hoteles** | Listar, crear, editar, activar/desactivar, eliminar. Filtros por nombre y estado. |
+| **Habitaciones** | Listar todas las habitaciones con filtros por hotel/tipo/estado. Crear, editar, activar/desactivar, eliminar. Cálculo automático de costo total (base + impuestos). |
+| **Reservas** | Listar reservas con filtro por hotel, estado y nombre de huésped. Ver detalle completo (huésped, contacto de emergencia, desglose de costos). Cancelar reserva. |
 
 ### Módulo Viajero (`/traveler`)
 
@@ -277,13 +275,13 @@ Los componentes **nunca** hacen llamadas HTTP directamente.
 
 ### Tecnologías
 
-- **Jasmine** — Framework de assertions (incluido con Angular CLI)
-- **Karma** — Test runner con Chrome Headless
+- **Vitest** — Test runner nativo de Angular 21 vía `@angular/build:unit-test` (sin Chrome requerido)
+- **Angular Testing Utilities** — `TestBed`, `fakeAsync`, `tick` para tests de servicios
 - **HttpTestingController** — Mock de peticiones HTTP sin dependencias externas
 
 ```bash
 # Una sola vez (CI)
-ng test --watch=false --browsers=ChromeHeadless
+ng test --watch=false
 
 # Modo watch (desarrollo)
 ng test
@@ -308,13 +306,13 @@ ng test
 
 | Tecnología | Uso |
 |---|---|
-| Angular 19+ | Framework principal |
+| Angular 21 | Framework principal |
 | Angular Material (azure-blue) | UI Components, Material 3 |
 | Angular Signals | Gestión de estado reactivo |
 | TypeScript 5.x | Tipado estático estricto |
 | SCSS | Estilos con variables |
 | uuid | Generación de IDs únicos |
-| Jasmine / Karma | Testing unitario |
+| Vitest | Testing unitario (runner nativo Angular 21) |
 
 ---
 
